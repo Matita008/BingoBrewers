@@ -1,6 +1,5 @@
 plugins {
     id 'net.fabricmc.fabric-loom-remap' version "${loom_version}"
-    //id 'java'
 }
 
 version = project.mod_version
@@ -21,6 +20,9 @@ repositories {
         name = 'Autoupdater'
         url = 'https://repo.nea.moe/releases'
     }
+
+    maven { url 'https://repo.polyfrost.cc/snapshots' }
+    maven { url 'https://repo.polyfrost.cc/releases' }
 }
 
 dependencies {
@@ -33,8 +35,21 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 
     implementation("net.hypixel:mod-api:1.0.1")
-    //TODO: shade this
+    //TODO: shade those
     implementation("moe.nea:libautoupdate:1.3.1") // Should be included in jar
+    implementation 'com.esotericsoftware:kryonet:2.22.0-RC1'
+
+    //Oneconfig?
+    implementation 'org.polyfrost.oneconfig:1.21.10-fabric:1.0.0-alpha.181'
+    implementation 'org.polyfrost.oneconfig.dependencies:bundled:1.0.0-alpha.109'
+    implementation 'org.polyfrost.oneconfig:internal:1.0.0-alpha.181'
+    implementation 'org.polyfrost.oneconfig:commands:1.0.0-alpha.181'
+    implementation 'org.polyfrost.oneconfig:config:1.0.0-alpha.181'
+    implementation 'org.polyfrost.oneconfig:config-impl:1.0.0-alpha.181'
+    implementation 'org.polyfrost.oneconfig:events:1.0.0-alpha.181'
+    implementation 'org.polyfrost.oneconfig:hud:1.0.0-alpha.181'
+    implementation 'org.polyfrost.oneconfig:ui:1.0.0-alpha.181'
+    implementation 'org.polyfrost.oneconfig:utils:1.0.0-alpha.181'
 }
 
 processResources {
@@ -68,3 +83,26 @@ jar {
 }
 
 //The fabric templates adds the publication task here
+
+/*
+//for OneConfig
+//aaaaaaaaa https://github.com/Polyfrost/OneConfigExampleMod/blob/modern-fabric/build.gradle.kts
+toolkitLoomHelper {
+    useOneConfig {
+        version = "1.0.0-alpha.106"
+        loaderVersion = "1.1.0-alpha.46"
+
+        for (module in arrayOf("commands", "config", "config-impl", "events", "internal", "ui", "utils")) {
+            +module
+        }
+    }
+
+    useDevAuth("1.2.1")
+    useMixinExtras("0.4.1")
+
+    // Turns off the server-side run configs, as we're building a client-sided mod.
+    disableRunConfigs(GameSide.SERVER)
+
+    // Defines the name of the Mixin refmap, which is used to map the Mixin classes to the obfuscated Minecraft classes.
+    useMixinRefMap(modData.id)
+}*/

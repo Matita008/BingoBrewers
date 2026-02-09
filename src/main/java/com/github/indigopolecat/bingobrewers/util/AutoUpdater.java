@@ -6,15 +6,11 @@ import com.github.indigopolecat.bingobrewers.Hud.TitleHud;
 import com.github.indigopolecat.bingobrewers.gui.UpdateScreen;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import me.djtheredstoner.devauth.common.util.request.Http;
 import moe.nea.libautoupdate.*;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.EnumChatFormatting;
-import net.minecraftforge.event.world.WorldEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraft.network.chat.Component;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.KeyManagerFactory;
@@ -31,6 +27,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 
 public class AutoUpdater {
+   public AutoUpdater() {  }
+   
     public static boolean updateScreen = false;
 
     private final UpdateContext context = new UpdateContext(
@@ -62,7 +60,7 @@ public class AutoUpdater {
         return context.checkUpdate(updaterType).thenComposeAsync(potentialUpdate -> {
             if(potentialUpdate.isUpdateAvailable()) {
                 return potentialUpdate.launchUpdate().thenApply((ignored) -> {
-                    Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(EnumChatFormatting.GREEN + "Bingo Brewers has been updated to the latest version! Please restart your game to apply the update."));
+                    Minecraft.getInstance().player.displayClientMessage(Component.literal("Bingo Brewers has been updated to the latest version! Please restart your game to apply the update."), true);
                     return true;
                 });
             }
@@ -73,39 +71,59 @@ public class AutoUpdater {
     static boolean updateChecked = false;
 
     public static boolean isThereUpdate = false;
-    @SubscribeEvent
-    public void updateCheck(WorldEvent event) {
-        if(!(event instanceof WorldEvent.Load)) return;
-        if (!updateChecked) {
-            updateChecked = true;
-
-            UpdateUtils.patchConnection(connection -> {
-                if (connection instanceof HttpsURLConnection) {
-                    ((HttpsURLConnection) connection).setSSLSocketFactory(ctx.getSocketFactory());
+    
+    public void registerUpdateCheck() {
+       ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
+          if (updateChecked) return;
+          updateChecked = true;
+          
+          UpdateUtils.patchConnection(connection -> {
+             if (connection instanceof HttpsURLConnection https) {
+                https.setSSLSocketFactory(ctx.getSocketFactory());
+             }
+          });
+          
+          System.out.println("Checking for updates...");
+          checkUpdate().thenAccept(updateAvailable -> {
+             if (!updateAvailable) return;
+             
+             if (BingoBrewersConfig.autoDownload) {
+                BingoBrewers.autoUpdater.update();
+                BingoBrewers.activeTitle = new TitleHud("Bingo Brewers will update on game close.", 0x47EB62, 4000,false);
+             } else {
+                isThereUpdate = true;
+                updateScreen = true;
+                client.execute(() -> {
+                   client.setScreen(new UpdateScreen());
+                });
+             }
+          });
+       });
+       
+       ServerWorldEvents.LOAD.register((server, level) ->{
+          if(!updateChecked) {
+             updateChecked = true;
+             
+             UpdateUtils.patchConnection(connection->{
+                if(connection instanceof HttpsURLConnection) {
+                   ((HttpsURLConnection)connection).setSSLSocketFactory(ctx.getSocketFactory());
                 }
-            });
-
-            System.out.println("Checking for updates...");
-            checkUpdate().thenAccept(updateAvailable -> {
+             });
+             
+             System.out.println("Checking for updates...");
+             checkUpdate().thenAccept(updateAvailable->{
                 if(updateAvailable) {
-                    if(BingoBrewersConfig.autoDownload) {
-                        BingoBrewers.autoUpdater.update();
-                        BingoBrewers.activeTitle = new TitleHud("Bingo Brewers will update on game close.", 0x47EB62, 4000, false);
-                    } else {
-                        isThereUpdate = true;
-                        updateScreen = true;
-                    }
+                   if(BingoBrewersConfig.autoDownload) {
+                      BingoBrewers.autoUpdater.update();
+                      BingoBrewers.activeTitle = new TitleHud("Bingo Brewers will update on game close.", 0x47EB62, 4000, false);
+                   } else {
+                      isThereUpdate = true;
+                      updateScreen = true;
+                   }
                 }
-            });
-        }
-    }
-
-    @SubscribeEvent
-    public void onTick(TickEvent.ClientTickEvent event) {
-        if (updateScreen && event.phase == TickEvent.Phase.END) {
-            updateScreen = false;
-            Minecraft.getMinecraft().displayGuiScreen(new UpdateScreen());
-        }
+             });
+          }
+       });
     }
 
     public String getChangelog() {

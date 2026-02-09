@@ -24,9 +24,7 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 public class Packets {
-
     // Fires event when an inventory packet is sent with a slot number greater than the slot count of the window.
     int slotCount = -1;
     boolean alreadyFired = false;
