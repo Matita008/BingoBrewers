@@ -9,7 +9,7 @@ import com.google.gson.JsonObject;
 import lombok.*;
 import moe.nea.libautoupdate.*;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLevelEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 
@@ -165,12 +165,12 @@ public class AutoUpdater {
                 } else {
                     isThereUpdate = true;
                     updateScreen = true;
-                    client.execute(() -> client.setScreen(new UpdateScreen()));
+                    client.execute(() -> client.setScreenAndShow(new UpdateScreen()));
                 }
             });
         });
         
-        ServerWorldEvents.LOAD.register((server, level)->{
+        ServerLevelEvents.LOAD.register((server, level)->{
             if(updateChecked) return;
             updateChecked = true;
             
@@ -214,7 +214,7 @@ public class AutoUpdater {
         return getUpdateContext().checkUpdate(updaterType).thenComposeAsync(potentialUpdate->{
             if(potentialUpdate.isUpdateAvailable()) {
                 return potentialUpdate.launchUpdate().thenApply((ignored)->{
-                    Minecraft.getInstance().player.displayClientMessage(Component.literal("Bingo Brewers has been updated to the latest version! Please restart your game to apply the update."), true);
+                    Minecraft.getInstance().player.sendOverlayMessage(Component.literal("Bingo Brewers has been updated to the latest version! Please restart your game to apply the update."));
                     return true;
                 });
             }

@@ -4,17 +4,24 @@ import com.github.indigopolecat.bingobrewers.util.CrystalHollowsItemTotal;
 import com.github.indigopolecat.kryo.KryoNetwork;
 import com.github.indigopolecat.kryo.KryoNetwork.CHChestItem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLevelEvents;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.renderer.MultiBufferSource;
+//? if <26.2 {
+/*import net.minecraft.client.renderer.MultiBufferSource;
+*///?} else {
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.util.FormattedCharSequence;
+//?}
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
 import net.minecraft.core.BlockPos;
 
@@ -42,29 +49,43 @@ public class CHWaypoints {
 
 
     public static void initRendering() {
-        WorldRenderEvents.AFTER_ENTITIES.register(CHWaypoints::renderAll);
+        LevelRenderEvents.AFTER_TRANSLUCENT_FEATURES.register(CHWaypoints::renderAll);
     }
 
-    private static void renderAll(WorldRenderContext context) {
+    private static void renderAll(LevelRenderContext context) {
         if (filteredWaypoints.isEmpty()) return;
 
         Minecraft mc = Minecraft.getInstance();
-        Camera camera = mc.gameRenderer.getMainCamera();
+        Camera camera = mc.gameRenderer.mainCamera();
 
-        Vec3 camPos = camera.getPosition();
+        Vec3 camPos = camera.position();
 
-        PoseStack poseStack = new PoseStack();
-        MultiBufferSource.BufferSource buffer = mc.renderBuffers().bufferSource();
         Font font = mc.font;
+
+        //? if <26.2 {
+        /*PoseStack poseStack = new PoseStack();
+        MultiBufferSource.BufferSource buffer = mc.renderBuffers().bufferSource();
 
         for (CHWaypoints wp : filteredWaypoints) {
             wp.render(poseStack, buffer, font, camera, camPos);
         }
 
         buffer.endBatch();
+        *///?} else {
+        PoseStack poseStack = context.poseStack();
+        SubmitNodeCollector collector = context.submitNodeCollector();
+
+        for (CHWaypoints wp : filteredWaypoints) {
+            wp.render(poseStack, collector, font, camera, camPos);
+        }
+        //?}
     }
 
-    private void render(PoseStack poseStack, MultiBufferSource buffer, Font font, Camera camera, Vec3 camPos) {
+    //? if <26.2 {
+    /*private void render(PoseStack poseStack, MultiBufferSource buffer, Font font, Camera camera, Vec3 camPos) {
+    *///?} else {
+    private void render(PoseStack poseStack, SubmitNodeCollector buffer, Font font, Camera camera, Vec3 camPos) {
+    //?}
         double waypointX = x + 0.5;
         double waypointY = y;
         double waypointZ = z + 0.5;
@@ -76,7 +97,7 @@ public class CHWaypoints {
         double dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
 
         Vector3f toWaypoint = new Vec3(dx, dy + 1, dz).normalize().toVector3f();
-        Vector3f look = camera.getLookVector();
+        Vector3fc look = camera.forwardVector();
 
         boolean nearCenter = toWaypoint.dot(look) > 0.99;
 
@@ -92,12 +113,12 @@ public class CHWaypoints {
         if (dist > 30) {
             double ratio = 30.0 / dist;
             rx = dx * ratio;
-            ry = dy * ratio + camera.getEntity().getEyeHeight();
+            ry = dy * ratio + camera.entity().getEyeHeight();
             rz = dz * ratio;
             dist = Math.sqrt(rx * rx + ry * ry + rz * rz);
         } else {
             rx = dx;
-            ry = dy + camera.getEntity().getEyeHeight();
+            ry = dy + camera.entity().getEyeHeight();
             rz = dz;
         }
 
@@ -112,7 +133,7 @@ public class CHWaypoints {
         poseStack.pushPose();
         poseStack.translate(rx, ry, rz);
 
-        poseStack.mulPose(new Quaternionf().rotateY((float) Math.toRadians(-camera.getYRot())).rotateX((float) Math.toRadians(camera.getXRot())));
+        poseStack.mulPose(new Quaternionf().rotateY((float) Math.toRadians(-camera.yRot())).rotateX((float) Math.toRadians(camera.xRot())));
 
         float s = (float) scale;
         poseStack.scale(-s, -s, s);
@@ -120,9 +141,15 @@ public class CHWaypoints {
         Matrix4f pose = poseStack.last().pose();
         int yOff = 0;
 
-        font.drawInBatch(shortName, -(totalWidth / 2f), yOff, shortNameColor | 0xFF000000, true, pose, buffer, Font.DisplayMode.SEE_THROUGH, 0, 0xF000F0);
+        //? if <26.2 {
+        /*font.drawInBatch(shortName, -(totalWidth / 2f), yOff, shortNameColor | 0xFF000000, true, pose, buffer, Font.DisplayMode.SEE_THROUGH, 0, 0xF000F0);
 
         font.drawInBatch(distStr, -(totalWidth / 2f) + nameWidth, yOff, distColor | 0xFF000000, true, pose, buffer, Font.DisplayMode.SEE_THROUGH, 0, 0xF000F0);
+        *///?} else {
+        buffer.submitText(poseStack, -(totalWidth / 2f), yOff, FormattedCharSequence.forward(shortName, net.minecraft.network.chat.Style.EMPTY), true, Font.DisplayMode.SEE_THROUGH, shortNameColor | 0xFF000000, 0, 0xF000F0, OverlayTexture.NO_OVERLAY);
+
+        buffer.submitText(poseStack, -(totalWidth / 2f) + nameWidth, yOff, FormattedCharSequence.forward(distStr, net.minecraft.network.chat.Style.EMPTY), true, Font.DisplayMode.SEE_THROUGH, distColor | 0xFF000000, 0, 0xF000F0, OverlayTexture.NO_OVERLAY);
+        //?}
 
         if (nearCenter) {
             for (CHChestItem item : filteredExpandedItems) {
@@ -134,9 +161,15 @@ public class CHWaypoints {
                 int lineWidth = font.width(line);
                 int countWidth = font.width(countStr);
 
-                font.drawInBatch(countStr, -(lineWidth / 2f), yOff, item.numberColor | 0xFF000000, true, pose, buffer, Font.DisplayMode.SEE_THROUGH, 0, 0xF000F0);
+                //? if <26.2 {
+                /*font.drawInBatch(countStr, -(lineWidth / 2f), yOff, item.numberColor | 0xFF000000, true, pose, buffer, Font.DisplayMode.SEE_THROUGH, 0, 0xF000F0);
 
                 font.drawInBatch(item.name, -(lineWidth / 2f) + countWidth, yOff, item.itemColor | 0xFF000000, true, pose, buffer, Font.DisplayMode.SEE_THROUGH, 0, 0xF000F0);
+                *///?} else {
+                buffer.submitText(poseStack, -(lineWidth / 2f), yOff, FormattedCharSequence.forward(countStr, net.minecraft.network.chat.Style.EMPTY), true, Font.DisplayMode.SEE_THROUGH, item.numberColor | 0xFF000000, 0, 0xF000F0, OverlayTexture.NO_OVERLAY);
+
+                buffer.submitText(poseStack, -(lineWidth / 2f) + countWidth, yOff, FormattedCharSequence.forward(item.name, net.minecraft.network.chat.Style.EMPTY), true, Font.DisplayMode.SEE_THROUGH, item.itemColor | 0xFF000000, 0, 0xF000F0, OverlayTexture.NO_OVERLAY);
+                //?}
             }
         }
 
