@@ -31,10 +31,13 @@ stonecutter parameters {
             replace("import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientWorldEvents;", "import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLevelEvents;")
 
             // The world render event hooks moved from the .world to the .level package and were restructured
-            // around the same render-state extraction model; AFTER_ENTITIES maps closest to AFTER_TRANSLUCENT_FEATURES.
+            // around the same render-state extraction model. END_MAIN (fires once per frame,
+            // unconditionally) is used instead of AFTER_TRANSLUCENT_FEATURES because the latter
+            // only fires per rendered chunk section - waypoints in a section outside the current
+            // frustum (e.g. looking straight up/down) would silently never get submitted.
             replace("import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;", "import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;")
             replace("import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;", "import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext;")
-            replace("WorldRenderEvents.AFTER_ENTITIES.register(CHWaypoints::renderAll);", "LevelRenderEvents.AFTER_TRANSLUCENT_FEATURES.register(CHWaypoints::renderAll);")
+            replace("WorldRenderEvents.AFTER_ENTITIES.register(CHWaypoints::renderAll);", "LevelRenderEvents.END_MAIN.register(CHWaypoints::renderAll);")
             replace("private static void renderAll(WorldRenderContext context) {", "private static void renderAll(LevelRenderContext context) {")
 
             // Player.displayClientMessage(Component, boolean) was split into two dedicated methods.

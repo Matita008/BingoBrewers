@@ -14,7 +14,6 @@ import net.minecraft.client.gui.Font;
 /*import net.minecraft.client.renderer.MultiBufferSource;
 *///?} else {
 import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.FormattedCharSequence;
 //?}
 import net.minecraft.world.phys.Vec3;
@@ -49,7 +48,7 @@ public class CHWaypoints {
 
 
     public static void initRendering() {
-        LevelRenderEvents.AFTER_TRANSLUCENT_FEATURES.register(CHWaypoints::renderAll);
+        LevelRenderEvents.END_MAIN.register(CHWaypoints::renderAll);
     }
 
     private static void renderAll(LevelRenderContext context) {
@@ -146,9 +145,9 @@ public class CHWaypoints {
 
         font.drawInBatch(distStr, -(totalWidth / 2f) + nameWidth, yOff, distColor | 0xFF000000, true, pose, buffer, Font.DisplayMode.SEE_THROUGH, 0, 0xF000F0);
         *///?} else {
-        buffer.submitText(poseStack, -(totalWidth / 2f), yOff, FormattedCharSequence.forward(shortName, net.minecraft.network.chat.Style.EMPTY), true, Font.DisplayMode.SEE_THROUGH, shortNameColor | 0xFF000000, 0, 0xF000F0, OverlayTexture.NO_OVERLAY);
+        buffer.submitText(poseStack, -(totalWidth / 2f), yOff, FormattedCharSequence.forward(shortName, net.minecraft.network.chat.Style.EMPTY), true, Font.DisplayMode.SEE_THROUGH, 0xF000F0, shortNameColor | 0xFF000000, 0, 0);
 
-        buffer.submitText(poseStack, -(totalWidth / 2f) + nameWidth, yOff, FormattedCharSequence.forward(distStr, net.minecraft.network.chat.Style.EMPTY), true, Font.DisplayMode.SEE_THROUGH, distColor | 0xFF000000, 0, 0xF000F0, OverlayTexture.NO_OVERLAY);
+        buffer.submitText(poseStack, -(totalWidth / 2f) + nameWidth, yOff, FormattedCharSequence.forward(distStr, net.minecraft.network.chat.Style.EMPTY), true, Font.DisplayMode.SEE_THROUGH, 0xF000F0, distColor | 0xFF000000, 0, 0);
         //?}
 
         if (nearCenter) {
@@ -166,9 +165,9 @@ public class CHWaypoints {
 
                 font.drawInBatch(item.name, -(lineWidth / 2f) + countWidth, yOff, item.itemColor | 0xFF000000, true, pose, buffer, Font.DisplayMode.SEE_THROUGH, 0, 0xF000F0);
                 *///?} else {
-                buffer.submitText(poseStack, -(lineWidth / 2f), yOff, FormattedCharSequence.forward(countStr, net.minecraft.network.chat.Style.EMPTY), true, Font.DisplayMode.SEE_THROUGH, item.numberColor | 0xFF000000, 0, 0xF000F0, OverlayTexture.NO_OVERLAY);
+                buffer.submitText(poseStack, -(lineWidth / 2f), yOff, FormattedCharSequence.forward(countStr, net.minecraft.network.chat.Style.EMPTY), true, Font.DisplayMode.SEE_THROUGH, 0xF000F0, item.numberColor | 0xFF000000, 0, 0);
 
-                buffer.submitText(poseStack, -(lineWidth / 2f) + countWidth, yOff, FormattedCharSequence.forward(item.name, net.minecraft.network.chat.Style.EMPTY), true, Font.DisplayMode.SEE_THROUGH, item.itemColor | 0xFF000000, 0, 0xF000F0, OverlayTexture.NO_OVERLAY);
+                buffer.submitText(poseStack, -(lineWidth / 2f) + countWidth, yOff, FormattedCharSequence.forward(item.name, net.minecraft.network.chat.Style.EMPTY), true, Font.DisplayMode.SEE_THROUGH, 0xF000F0, item.itemColor | 0xFF000000, 0, 0);
                 //?}
             }
         }
