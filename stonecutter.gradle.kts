@@ -31,13 +31,13 @@ stonecutter parameters {
             replace("import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientWorldEvents;", "import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLevelEvents;")
 
             // The world render event hooks moved from the .world to the .level package and were restructured
-            // around the same render-state extraction model. END_MAIN (fires once per frame,
-            // unconditionally) is used instead of AFTER_TRANSLUCENT_FEATURES because the latter
-            // only fires per rendered chunk section - waypoints in a section outside the current
-            // frustum (e.g. looking straight up/down) would silently never get submitted.
+            // around the same render-state extraction model. COLLECT_SUBMITS is the documented hook for
+            // adding to LevelRenderContext#submitNodeCollector() (fires once per frame at the end of
+            // submitFeatures(), not per rendered chunk section like AFTER_TRANSLUCENT_FEATURES, which would
+            // silently drop waypoints whose section falls outside the current frustum).
             replace("import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;", "import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;")
             replace("import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;", "import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext;")
-            replace("WorldRenderEvents.AFTER_ENTITIES.register(CHWaypoints::renderAll);", "LevelRenderEvents.END_MAIN.register(CHWaypoints::renderAll);")
+            replace("WorldRenderEvents.AFTER_ENTITIES.register(CHWaypoints::renderAll);", "LevelRenderEvents.COLLECT_SUBMITS.register(CHWaypoints::renderAll);")
             replace("private static void renderAll(WorldRenderContext context) {", "private static void renderAll(LevelRenderContext context) {")
 
             // Player.displayClientMessage(Component, boolean) was split into two dedicated methods.

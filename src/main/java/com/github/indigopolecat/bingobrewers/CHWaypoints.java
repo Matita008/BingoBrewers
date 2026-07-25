@@ -48,7 +48,7 @@ public class CHWaypoints {
 
 
     public static void initRendering() {
-        LevelRenderEvents.END_MAIN.register(CHWaypoints::renderAll);
+        LevelRenderEvents.COLLECT_SUBMITS.register(CHWaypoints::renderAll);
     }
 
     private static void renderAll(LevelRenderContext context) {

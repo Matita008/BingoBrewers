@@ -30,16 +30,20 @@ public class AutoUpdater {
     public static boolean updateScreen = false;
     public static boolean isThereUpdate = false;
     static boolean updateChecked = false;
-    
+
+    // The Minecraft version this jar was built for - each GitHub release carries one jar per
+    // supported version, so the updater needs this to pick the right one. See MultiVersionGithubSource.
+    private static final String MINECRAFT = /*$ minecraft*/ "1.21.11";
+
     private static UpdateContext getUpdateContext() {
         String source = BingoBrewersConfig.getConfig().updaterRepository;
         String owner = Optional.ofNullable(source.split("/")[0]).filter(String::isBlank).orElse("IndigoPolecat");
-        
+
         String repo = "BingoBrewers";
         if(source.contains("/")) repo = Optional.ofNullable(source.split("/")[1]).filter(String::isBlank).orElse("BingoBrewers");
-        
+
         return new UpdateContext(
-            UpdateSource.githubUpdateSource("IndigoPolecat", "BingoBrewers"),
+            new MultiVersionGithubSource("IndigoPolecat", "BingoBrewers", MINECRAFT),
             UpdateTarget.deleteAndSaveInTheSameFolder(AutoUpdater.class),
             new StringSemVerCurrentVersion(BingoBrewers.version),
             "BingoBrewers"
