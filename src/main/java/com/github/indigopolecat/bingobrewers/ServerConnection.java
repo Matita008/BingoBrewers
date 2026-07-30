@@ -391,6 +391,12 @@ public class ServerConnection extends Listener implements Runnable {
         waitTime = (int) (5000 * Math.random() + 2000);
         
         Log.warn("Disconnected from server.");
+
+        try {
+            Thread.sleep((int) waitTime);
+        } catch (InterruptedException ex) {
+            throw new RuntimeException(ex);
+        }
         reconnect = true;
         while (reconnect) {
             Log.info("Reconnecting to Bingo Brewers server.");
