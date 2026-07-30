@@ -4,7 +4,7 @@ import com.mojang.blaze3d.platform.Window;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 import lombok.*;
 
@@ -21,7 +21,7 @@ public class TitleHud implements Hud, TimedHud {
         color = hud.color;
     }
     
-    public void render(GuiGraphics graphics, DeltaTracker tickCounter) {
+    public void render(GuiGraphicsExtractor graphics, DeltaTracker tickCounter) {
         // set alpha to 255 if not provided in color
         if((color & 0xFF000000) == 0) color |= 0xFF000000;
         
@@ -34,6 +34,6 @@ public class TitleHud implements Hud, TimedHud {
         
         Font font = mc.font;
         
-        graphics.drawString(font, title, (width - font.width(title)) / 2, (height / 2) - font.lineHeight - 5, color, true);
+        graphics.text(font, title, (width - font.width(title)) / 2, (height / 2) - font.lineHeight - 5, color, true);
     }
 }

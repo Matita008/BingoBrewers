@@ -10,9 +10,12 @@ import com.github.indigopolecat.events.HypixelPackets;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.brigadier.context.CommandContext;
 import me.shedaniel.autoconfig.AutoConfig;
+import me.shedaniel.autoconfig.ConfigManager;
+import me.shedaniel.autoconfig.gui.ConfigScreenProvider;
+import me.shedaniel.autoconfig.gui.DefaultGuiProviders;
 import me.shedaniel.autoconfig.gui.registry.GuiRegistry;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommands;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -32,6 +35,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class BingoBrewers implements ClientModInitializer {
     public static BingoBrewers INSTANCE;
+
+    // Only used on 26.1+, where AutoConfig no longer keeps a per-class GuiRegistry for us. See ConfigScreen.
+    public static final GuiRegistry guiRegistry = DefaultGuiProviders.apply(new GuiRegistry());
 
     @Getter(onMethod_ = @Synchronized) @Setter(onMethod_ = @Synchronized)
     private static volatile Client client;
@@ -64,10 +70,14 @@ public class BingoBrewers implements ClientModInitializer {
             Minecraft.getInstance().execute(()-> {
                 boolean render = RenderSystem.isOnRenderThread();
                 Log.LOG.debug("renderThread = {}", render);
-                Log.LOG.debug("parent screen={}", Minecraft.getInstance().screen);
-                Screen configScreen = AutoConfig.getConfigScreen(BingoBrewersConfig.class, null).get();
-                Minecraft.getInstance().setScreen(configScreen);
-                Log.LOG.debug("configScreen present={}, current screen={}", configScreen != null, Minecraft.getInstance().screen);
+                Log.LOG.debug("parent screen=?");
+                //? if <26.1 {
+                /*Screen configScreen = AutoConfig.getConfigScreen(BingoBrewersConfig.class, null).get();
+                *///?} else {
+                Screen configScreen = new ConfigScreenProvider<>((ConfigManager<BingoBrewersConfig>) AutoConfig.getConfigHolder(BingoBrewersConfig.class), guiRegistry, null).get();
+                //?}
+                Minecraft.getInstance().setScreenAndShow(configScreen);
+                Log.LOG.debug("configScreen present={}, current screen=?", configScreen != null);
             });
         });
     }
@@ -87,10 +97,10 @@ public class BingoBrewers implements ClientModInitializer {
         
         //register the commands
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
-            dispatcher.register(ClientCommandManager.literal("bb").executes(BingoBrewers::configCommand));
-            dispatcher.register(ClientCommandManager.literal("bingobrewers").executes(BingoBrewers::configCommand));
+            dispatcher.register(ClientCommands.literal("bb").executes(BingoBrewers::configCommand));
+            dispatcher.register(ClientCommands.literal("bingobrewers").executes(BingoBrewers::configCommand));
             // Debug command used to dump the list of currently active huds
-            /*dispatcher.register(ClientCommandManager.literal("bbdebughud").executes(c -> {
+            /*dispatcher.register(ClientCommands.literal("bbdebughud").executes(c -> {
                 Log.info("Active huds: ");
                 for(Hud hud : HudManager.activeHuds) {
                     Log.info(hud.getClass() + ": " + hud.isExpired() + (hud instanceof TimedHud th? " current: " + System.currentTimeMillis() + " end: " +
@@ -126,8 +136,12 @@ public class BingoBrewers implements ClientModInitializer {
         
         try {
             AutoConfig.register(BingoBrewersConfig.class, ConfigSerializer::new);
-            GuiRegistry registry = AutoConfig.getGuiRegistry(BingoBrewersConfig.class);
+            //? if <26.1 {
+            /*GuiRegistry registry = AutoConfig.getGuiRegistry(BingoBrewersConfig.class);
             registry.registerTypeProvider(new ColorGuiProvider(), Color.class);
+            *///?} else {
+            guiRegistry.registerTypeProvider(new ColorGuiProvider(), Color.class);
+            //?}
             AutoConfig.getConfigHolder(BingoBrewersConfig.class).registerSaveListener(BingoBrewersConfig::onSave);
         } catch (Exception e) {
             Log.error("An error occurred while loading the configuration file", e);

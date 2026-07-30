@@ -9,7 +9,7 @@ import com.google.gson.JsonObject;
 import lombok.*;
 import moe.nea.libautoupdate.*;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLevelEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 
@@ -30,16 +30,20 @@ public class AutoUpdater {
     public static boolean updateScreen = false;
     public static boolean isThereUpdate = false;
     static boolean updateChecked = false;
-    
+
+    // The Minecraft version this jar was built for - each GitHub release carries one jar per
+    // supported version, so the updater needs this to pick the right one. See MultiVersionGithubSource.
+    private static final String MINECRAFT = /*$ minecraft*/ "1.21.11";
+
     private static UpdateContext getUpdateContext() {
         String source = BingoBrewersConfig.getConfig().updaterRepository;
         String owner = Optional.ofNullable(source.split("/")[0]).filter(String::isBlank).orElse("IndigoPolecat");
-        
+
         String repo = "BingoBrewers";
         if(source.contains("/")) repo = Optional.ofNullable(source.split("/")[1]).filter(String::isBlank).orElse("BingoBrewers");
-        
+
         return new UpdateContext(
-            UpdateSource.githubUpdateSource("IndigoPolecat", "BingoBrewers"),
+            new MultiVersionGithubSource("IndigoPolecat", "BingoBrewers", MINECRAFT),
             UpdateTarget.deleteAndSaveInTheSameFolder(AutoUpdater.class),
             new StringSemVerCurrentVersion(BingoBrewers.version),
             "BingoBrewers"
@@ -165,12 +169,12 @@ public class AutoUpdater {
                 } else {
                     isThereUpdate = true;
                     updateScreen = true;
-                    client.execute(() -> client.setScreen(new UpdateScreen()));
+                    client.execute(() -> client.setScreenAndShow(new UpdateScreen()));
                 }
             });
         });
         
-        ServerWorldEvents.LOAD.register((server, level)->{
+        ServerLevelEvents.LOAD.register((server, level)->{
             if(updateChecked) return;
             updateChecked = true;
             
@@ -214,7 +218,7 @@ public class AutoUpdater {
         return getUpdateContext().checkUpdate(updaterType).thenComposeAsync(potentialUpdate->{
             if(potentialUpdate.isUpdateAvailable()) {
                 return potentialUpdate.launchUpdate().thenApply((ignored)->{
-                    Minecraft.getInstance().player.displayClientMessage(Component.literal("Bingo Brewers has been updated to the latest version! Please restart your game to apply the update."), true);
+                    Minecraft.getInstance().player.sendOverlayMessage(Component.literal("Bingo Brewers has been updated to the latest version! Please restart your game to apply the update."));
                     return true;
                 });
             }

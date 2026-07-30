@@ -6,7 +6,7 @@ import com.github.indigopolecat.bingobrewers.hud.TimedTextHud;
 import com.github.indigopolecat.bingobrewers.util.Log;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -19,7 +19,7 @@ public class UpdateScreen extends Screen {
     }
     
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {//i, j *should* be the x,y of the mouse (see net.minecraft.client.renderer.GameRenderer#render)
+    public void extractRenderState(GuiGraphicsExtractor guiGraphics, int i, int j, float f) {//i, j *should* be the x,y of the mouse (see net.minecraft.client.renderer.GameRenderer#render)
         // renderBackground(guiGraphics, i, j, f);
         // The background should be already rendered
         // Why? don't ask me
@@ -35,15 +35,15 @@ public class UpdateScreen extends Screen {
         // Split by new lines
         String[] lines = changelog.split("\n");
         
-        guiGraphics.drawString(font, title, width / 2 - textWidth / 2, 10, 0xFFFFFFFF, false);
+        guiGraphics.text(font, title, width / 2 - textWidth / 2, 10, 0xFFFFFFFF, false);
         
         // Draw each line separately
         for (int n = 0; n < lines.length; n++) {
-            guiGraphics.drawString(font, ChatFormatting.RESET + lines[n], 10, 10 + (n + 1) * 10, 0xFFFFFFFF);
+            guiGraphics.text(font, ChatFormatting.RESET + lines[n], 10, 10 + (n + 1) * 10, 0xFFFFFFFF);
         }
         
         //Render the button as the last thing
-        super.render(guiGraphics, i, j, f);
+        super.extractRenderState(guiGraphics, i, j, f);
     }
     
     @Override
@@ -58,13 +58,13 @@ public class UpdateScreen extends Screen {
                     BingoBrewers.autoUpdater.update();
                     //BingoBrewers.activeTitle = new TitleHud("Bingo Brewers will update on game close.", 0x47EB62, 4000, false);//TODO: look at this
                 } else {
-                    Minecraft.getInstance().player.displayClientMessage(Component.literal("Bingo Brewers is up to date!").withColor(0x00FF00), false);
+                    Minecraft.getInstance().player.sendSystemMessage(Component.literal("Bingo Brewers is up to date!").withColor(0x00FF00));
                 }
             });
-            Minecraft.getInstance().setScreen(null);
+            Minecraft.getInstance().setScreenAndShow(null);
         }).pos(width / 2 - 100, height - 50).build();
         
-        Button closeButton = Button.builder(Component.literal("Close Screen without updating"), b -> Minecraft.getInstance().setScreen(null))
+        Button closeButton = Button.builder(Component.literal("Close Screen without updating"), b -> Minecraft.getInstance().setScreenAndShow(null))
                                    .pos(width / 2 - 100, height - 25).build();
         
         addRenderableWidget(updateNowButton);

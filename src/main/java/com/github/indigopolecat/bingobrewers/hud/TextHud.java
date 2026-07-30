@@ -5,7 +5,7 @@ import com.github.indigopolecat.bingobrewers.util.Log;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
@@ -53,7 +53,7 @@ public class TextHud implements Hud {
     }
     
     @Override
-    public void render(GuiGraphics graphics, DeltaTracker tickCounter) {
+    public void render(GuiGraphicsExtractor graphics, DeltaTracker tickCounter) {
         if(isExpired()) {
             Log.warn("Tried to render expired TextHud", new Exception());
             return;
@@ -112,7 +112,7 @@ public class TextHud implements Hud {
             }
 
             // Draw line
-            graphics.drawString(font, textToRender, (int)(x / scale), (int)(y / scale), defaultColor, false);
+            graphics.text(font, textToRender, (int)(x / scale), (int)(y / scale), defaultColor, false);
             y += (int)((font.lineHeight + 1) * scale);
         }
         graphics.pose().popMatrix();

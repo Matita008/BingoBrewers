@@ -6,7 +6,7 @@ import com.github.indigopolecat.bingobrewers.util.ServerUtils;
 import com.github.indigopolecat.bingobrewers.util.SplashNotificationInfo;
 import com.github.indigopolecat.kryo.KryoNetwork;
 import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 import lombok.*;
 
@@ -41,7 +41,7 @@ public class SplashHud extends TextHud {
     }
     
     @Override
-    public void render(GuiGraphics graphics, DeltaTracker tickCounter) {
+    public void render(GuiGraphicsExtractor graphics, DeltaTracker tickCounter) {
         final BingoBrewersConfig.SplashHudSettings config = BingoBrewersConfig.getConfig().splashConfig;
         // Check this during render so that someone can toggle the setting on or join skyblock, and if there is an active splash it will show up immediately.
         if(!BingoBrewersConfig.getConfig().splashNotificationsEnabled) return;

@@ -1,7 +1,7 @@
 package com.github.indigopolecat.bingobrewers.hud;
 
 import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 /**
  * Represent a GUI/Hud that is active
@@ -14,7 +14,7 @@ public interface Hud {
      * @param graphics the {@link GuiGraphics} used for rendering
      * @param tickCounter the {@link DeltaTracker} providing timing information
      */
-    void render(GuiGraphics graphics, DeltaTracker tickCounter);
+    void render(GuiGraphicsExtractor graphics, DeltaTracker tickCounter);
 
     /**
      * Called every frame to determine if this HUD is valid and should be rendered via {@link #render(GuiGraphics, DeltaTracker)}
