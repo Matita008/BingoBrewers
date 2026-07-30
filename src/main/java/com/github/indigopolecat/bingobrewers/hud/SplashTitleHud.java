@@ -5,11 +5,22 @@ import com.github.indigopolecat.bingobrewers.BingoBrewersConfig;
 public class SplashTitleHud extends TitleHud {
     private static SplashTitleHud previous;
     
-    public SplashTitleHud(String hub) {
-        super(1000L * BingoBrewersConfig.getConfig().splashConfig.alertDisplayTime, "Splash in Hub " + hub, BingoBrewersConfig.getConfig().alertTextColorHex);
+    public SplashTitleHud(String hub, boolean dungeonHub, boolean isPrivate) {
+        super(1000L * BingoBrewersConfig.getConfig().splashConfig.alertDisplayTime, getMessage(hub, dungeonHub, isPrivate), BingoBrewersConfig.getConfig().alertTextColorHex);
         
         if(previous != null && !previous.isExpired()) HudManager.removeHud(previous);
         previous = this;
+    }
+
+    private static String getMessage(String hub, boolean dungeonHub, boolean isPrivate) {
+        String message = "Splash in Hub " + hub;
+        if (isPrivate) {
+            // first because if someone ever does a private dungeonhub splash it makes more sense to say private hub than dungeon hub
+            message = "Splash in Private Hub (/p join " + hub + ")";
+        } else if (dungeonHub) {
+            message = "Splash in Dungeon Hub " + hub;
+        }
+        return message;
     }
     
     @Override
