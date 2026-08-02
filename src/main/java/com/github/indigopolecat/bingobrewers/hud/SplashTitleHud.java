@@ -3,13 +3,8 @@ package com.github.indigopolecat.bingobrewers.hud;
 import com.github.indigopolecat.bingobrewers.BingoBrewersConfig;
 
 public class SplashTitleHud extends TitleHud {
-    private static SplashTitleHud previous;
-    
     public SplashTitleHud(String hub, boolean dungeonHub, boolean isPrivate) {
         super(1000L * BingoBrewersConfig.getConfig().splashConfig.alertDisplayTime, getMessage(hub, dungeonHub, isPrivate), BingoBrewersConfig.getConfig().alertTextColorHex);
-        
-        if(previous != null && !previous.isExpired()) HudManager.removeHud(previous);
-        previous = this;
     }
 
     private static String getMessage(String hub, boolean dungeonHub, boolean isPrivate) {
@@ -21,10 +16,5 @@ public class SplashTitleHud extends TitleHud {
             message = "Splash in Dungeon Hub " + hub;
         }
         return message;
-    }
-    
-    @Override
-    public boolean isExpired() {
-        return this == previous && super.isExpired();
     }
 }

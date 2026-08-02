@@ -8,6 +8,8 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 import lombok.*;
 
+import static com.github.indigopolecat.bingobrewers.hud.HudManager.activeHuds;
+
 @AllArgsConstructor
 public class TitleHud implements Hud, TimedHud {
     @Getter private final long startTime = System.currentTimeMillis();
@@ -35,5 +37,16 @@ public class TitleHud implements Hud, TimedHud {
         Font font = mc.font;
         
         graphics.text(font, title, (width - font.width(title)) / 2, (height / 2) - font.lineHeight - 5, color, true);
+    }
+
+    public static void addTitleHud(TitleHud hud) {
+        // remove any other title huds when initializing
+        for (Hud activeHud : activeHuds) {
+            if (activeHud instanceof TitleHud) {
+                activeHuds.remove(activeHud);
+            }
+        }
+
+        HudManager.addNewHud(hud);
     }
 }
