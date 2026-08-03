@@ -1,6 +1,7 @@
 package com.github.indigopolecat.bingobrewers.hud;
 
 import com.github.indigopolecat.bingobrewers.BingoBrewersConfig;
+import com.github.indigopolecat.bingobrewers.util.Log;
 import com.github.indigopolecat.bingobrewers.util.Sounds;
 
 public class SplashTitleHud extends TitleHud {
@@ -14,6 +15,14 @@ public class SplashTitleHud extends TitleHud {
 
     public SplashTitleHud(String hub, boolean dungeonHub, boolean isPrivate) {
         super(1000L * BingoBrewersConfig.getConfig().splashConfig.alertDisplayTime, getMessage(hub, dungeonHub, isPrivate), BingoBrewersConfig.getConfig().alertTextColorHex);
+
+        final int alertScale = BingoBrewersConfig.getConfig().splashConfig.alertScale;
+        try {
+            setScale(alertScale / 100f);
+        } catch (IllegalArgumentException e) {
+            // leave the alert at its default scale rather than losing the notification entirely
+            Log.warnOnce("splashConfig.alertScale=" + alertScale, "Config.splashConfig.alertScale is set to an invalid value: " + alertScale + " (scaled: " + alertScale / 100f + ")");
+        }
     }
 
     private static String getMessage(String hub, boolean dungeonHub, boolean isPrivate) {

@@ -36,6 +36,8 @@
 
   "text.autoconfig.bingobrewers.option.splashConfig.displayTime": "How long the information of the current splash will stay on the top-left",
   "text.autoconfig.bingobrewers.option.splashConfig.alertDisplayTime": "How long the alert of the latest splash will appear in the center",
+  "text.autoconfig.bingobrewers.option.splashConfig.alertScale": "Alert Scale",
+  "text.autoconfig.bingobrewers.option.splashConfig.alertScale.@Tooltip": "Scale of the centered splash alert text, as a percentage",
 
   "text.autoconfig.bingobrewers.option.crystalHollowsWaypointsToggle": "Enable CH Waypoints",
   "text.autoconfig.bingobrewers.option.crystalHollowsWaypointsToggle.@Tooltip": "Toggle Crystal Hollows Waypoints",

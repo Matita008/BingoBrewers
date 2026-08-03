@@ -81,10 +81,13 @@ public class BingoBrewersConfig implements ConfigData {
         
         @Comment(value = "In seconds")
         public int alertDisplayTime = 4;
+
+        @ConfigEntry.BoundedDiscrete(min = 30, max = 300)
+        public int alertScale = 100; //This is scale*100, since autoconfig does not support sliders with floats/doubles
     }
 
-    @Comment(value = "Set the volume of the splash notification") @ConfigEntry.BoundedDiscrete(max = 200)
-    public int splashNotificationVolume = 100;
+    @Comment(value = "Set the volume of the splash notification") @ConfigEntry.BoundedDiscrete(max = 100)
+    public int splashNotificationVolume = 75;
 
     @ConfigEntry.ColorPicker(allowAlpha = true) //apparently it does work with ints
     @Comment(value = "ARGB, the firs 2 characters are the transparency")
