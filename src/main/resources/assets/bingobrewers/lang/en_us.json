@@ -28,6 +28,8 @@
   "text.autoconfig.bingobrewers.option.splashConfig.y": "splash HUD Y Position",
   "text.autoconfig.bingobrewers.option.splashConfig.scale": "splash HUD Scale",
 
+  "sound.bingobrewers.splash_notification": "Splash announced",
+
   "text.autoconfig.bingobrewers.option.splashNotificationVolume": "Notification Volume",
   "text.autoconfig.bingobrewers.option.splashNotificationVolume.@Tooltip": "Set the volume of the splash notification (0-200)",
   "text.autoconfig.bingobrewers.option.alertTextColorHex": "Set the color of the alert text (e.g. \"Splash in Hub 14\")",
