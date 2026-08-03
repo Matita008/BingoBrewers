@@ -2,7 +2,7 @@
 mod.id = "bingobrewers"
 mod.name = "Bingo Brewers"
 mod.group = "com.github.indigopolecat.bingobrewers"
-mod.version = "0.4.1"
+mod.version = "0.4.2"
 
 # Versions shared across every target - not tied to a Minecraft release.
 deps.fabric_loader = "0.19.3"
