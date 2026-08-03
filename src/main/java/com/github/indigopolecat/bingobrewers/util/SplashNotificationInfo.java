@@ -3,7 +3,6 @@ package com.github.indigopolecat.bingobrewers.util;
 import com.github.indigopolecat.bingobrewers.BingoBrewersConfig;
 import com.github.indigopolecat.bingobrewers.PlayerInfo;
 import com.github.indigopolecat.bingobrewers.ServerConnection;
-import com.github.indigopolecat.bingobrewers.hud.HudManager;
 import com.github.indigopolecat.bingobrewers.hud.SplashTitleHud;
 import com.github.indigopolecat.kryo.KryoNetwork;
 
@@ -71,16 +70,16 @@ public class SplashNotificationInfo {
         
         if(BingoBrewersConfig.getConfig().splashNotificationsEnabled && (BingoBrewersConfig.getConfig().splashNotificationsOutsideSkyblock || ServerUtils.isBingo() || PlayerInfo.inSkyblockOrPTL)) {
             if(initialize) {
-                HudManager.addNewHud(new SplashTitleHud(notif.hub, notif.dungeonHub, notif.isPrivate));
+                SplashTitleHud.addSplashTitleHud(new SplashTitleHud(notif.hub, notif.dungeonHub, notif.isPrivate));
             } else {
                 if(!serverID.equals(notif.serverID) && !serverID.isEmpty()) {
                     // if the new server ID doesn't match the old, and the old did have a value (i.e. it isn't being set for the first time), then clear the player count and notify
                     lobbyPlayerCount = "";
-                    HudManager.addNewHud(new SplashTitleHud(notif.hub, notif.dungeonHub, notif.isPrivate));
+                    SplashTitleHud.addSplashTitleHud(new SplashTitleHud(notif.hub, notif.dungeonHub, notif.isPrivate));
                 } else if((!hub.equals(notif.hub) || lastNotif.dungeonHub != notif.dungeonHub) && serverID.isEmpty()) {
                     // if the hub number changed, and the server ID is empty (if there was a server id and it didn't change when the server ID did, then they're probably already in the right lobby), then clear the player count and notify
                     lobbyPlayerCount = "";
-                    HudManager.addNewHud(new SplashTitleHud(notif.hub, notif.dungeonHub, notif.isPrivate));
+                    SplashTitleHud.addSplashTitleHud(new SplashTitleHud(notif.hub, notif.dungeonHub, notif.isPrivate));
                 }
             }
         } else Log.info("Skipped alert for splash " + notif.splash);

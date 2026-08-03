@@ -15,7 +15,6 @@ import java.util.*;
 public class SplashHud extends TextHud {
     @Getter private final long startTime = System.currentTimeMillis();
     private static SplashHud INSTANCE;
-    private static boolean notifiedScale = false;
     
     public SplashHud() {
         super(0xFFFFFFFF);
@@ -53,11 +52,7 @@ public class SplashHud extends TextHud {
         try {
             setScale(config.scale/100f);
         } catch (IllegalArgumentException e) {
-            if(!notifiedScale) {
-                notifiedScale = true;
-                Log.warn("Config.hud.scale is set to an invalid value: " + config.scale + "(scaled: " + config.scale / 100f + ")");
-                Log.info("Invalid scale", e);
-            }
+            Log.warnOnce("splashConfig.scale=" + config.scale, "Config.splashConfig.scale is set to an invalid value: " + config.scale + " (scaled: " + config.scale / 100f + ")");
         }
         
         List<String> textToRender = new ArrayList<>();

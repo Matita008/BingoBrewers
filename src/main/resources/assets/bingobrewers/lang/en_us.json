@@ -28,12 +28,16 @@
   "text.autoconfig.bingobrewers.option.splashConfig.y": "splash HUD Y Position",
   "text.autoconfig.bingobrewers.option.splashConfig.scale": "splash HUD Scale",
 
+  "sound.bingobrewers.splash_notification": "Splash announced",
+
   "text.autoconfig.bingobrewers.option.splashNotificationVolume": "Notification Volume",
   "text.autoconfig.bingobrewers.option.splashNotificationVolume.@Tooltip": "Set the volume of the splash notification (0-200)",
   "text.autoconfig.bingobrewers.option.alertTextColorHex": "Set the color of the alert text (e.g. \"Splash in Hub 14\")",
 
   "text.autoconfig.bingobrewers.option.splashConfig.displayTime": "How long the information of the current splash will stay on the top-left",
   "text.autoconfig.bingobrewers.option.splashConfig.alertDisplayTime": "How long the alert of the latest splash will appear in the center",
+  "text.autoconfig.bingobrewers.option.splashConfig.alertScale": "Alert Scale",
+  "text.autoconfig.bingobrewers.option.splashConfig.alertScale.@Tooltip": "Scale of the centered splash alert text, as a percentage",
 
   "text.autoconfig.bingobrewers.option.crystalHollowsWaypointsToggle": "Enable CH Waypoints",
   "text.autoconfig.bingobrewers.option.crystalHollowsWaypointsToggle.@Tooltip": "Toggle Crystal Hollows Waypoints",
