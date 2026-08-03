@@ -73,7 +73,7 @@ public class SplashNotificationInfo {
                 SplashTitleHud.addSplashTitleHud(new SplashTitleHud(notif.hub, notif.dungeonHub, notif.isPrivate));
             } else {
                 if(!serverID.equals(notif.serverID) && !serverID.isEmpty()) {
-                    // if the new server ID doesn't match the old, and the old did have a value (i.e. it isn't being set for the first time), then clear the player count and notif
+                    // if the new server ID doesn't match the old, and the old did have a value (i.e. it isn't being set for the first time), then clear the player count and notify
                     lobbyPlayerCount = "";
                     SplashTitleHud.addSplashTitleHud(new SplashTitleHud(notif.hub, notif.dungeonHub, notif.isPrivate));
                 } else if((!hub.equals(notif.hub) || lastNotif.dungeonHub != notif.dungeonHub) && serverID.isEmpty()) {
